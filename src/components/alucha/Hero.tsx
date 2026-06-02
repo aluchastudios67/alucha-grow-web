@@ -1,5 +1,6 @@
 import { ArrowRight, Sparkles } from "lucide-react";
-import plumImage from "@/assets/alucha-plum-hero.png";
+import plumAsset from "@/assets/alucha-icon.png.asset.json";
+const plumImage = plumAsset.url;
 import { PlumOrb } from "./Plum";
 
 export function Hero() {
