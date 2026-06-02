@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Aluch Studios" },
+      { name: "description", content: "Alucha Growth Studio builds modern, premium single-page websites for businesses." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Aluch Studios" },
+      { property: "og:description", content: "Alucha Growth Studio builds modern, premium single-page websites for businesses." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Aluch Studios" },
+      { name: "twitter:description", content: "Alucha Growth Studio builds modern, premium single-page websites for businesses." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/764e7e97-780d-43ab-b058-2ea032f53be7/id-preview-08c2d951--c946555e-9ddc-480c-a7b4-2aff39925418.lovable.app-1780393000114.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/764e7e97-780d-43ab-b058-2ea032f53be7/id-preview-08c2d951--c946555e-9ddc-480c-a7b4-2aff39925418.lovable.app-1780393000114.png" },
     ],
     links: [
       {
