@@ -27,15 +27,31 @@ import {
 
 export const Route = createFileRoute("/admin")({
   loader: async () => {
-    const orders = await getOrders();
-    const smtp = await checkSmtpStatus();
-    return { initialOrders: orders, smtp };
+    let orders: Order[] = [];
+    let loadError: string | null = null;
+    let smtp: any = { isConfigured: false, smtpHost: null, smtpUser: null, supabase: null };
+
+    try {
+      orders = await getOrders();
+    } catch (err: any) {
+      console.error("Loader error fetching orders:", err);
+      loadError = err?.message || String(err);
+    }
+
+    try {
+      smtp = await checkSmtpStatus();
+    } catch (err: any) {
+      console.error("Loader error checking SMTP status:", err);
+      if (!loadError) loadError = err?.message || String(err);
+    }
+
+    return { initialOrders: orders, smtp, loadError };
   },
   component: AdminComponent,
 });
 
 function AdminComponent() {
-  const { initialOrders, smtp } = Route.useLoaderData();
+  const { initialOrders, smtp, loadError } = Route.useLoaderData();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -242,7 +258,19 @@ function AdminComponent() {
         </div>
       </header>
 
-      {/* Connection & SMTP status alert */}
+      {/* System Status, loadError, SMTP, and Supabase diagnostics */}
+      {loadError && (
+        <div className="mb-6 p-4 border border-red-500 bg-red-950/20 text-red-400 rounded-lg text-xs font-mono space-y-2">
+          <div className="flex items-center gap-2 font-bold text-sm">
+            <AlertCircle size={16} /> SYSTEM ERROR DETECTED DURING LOAD
+          </div>
+          <p className="whitespace-pre-wrap">{loadError}</p>
+          <p className="text-red-500/80">
+            Please make sure that the Supabase environment variables are correctly set on Vercel and that you have redeployed the project.
+          </p>
+        </div>
+      )}
+
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="border border-green-500/30 bg-green-950/10 p-4 rounded flex items-center justify-between">
           <div className="space-y-1">
@@ -252,13 +280,13 @@ function AdminComponent() {
           <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping" />
         </div>
 
-        <div className="border border-green-500/30 bg-green-950/10 p-4 rounded flex items-center justify-between md:col-span-2">
+        <div className="border border-green-500/30 bg-green-950/10 p-4 rounded flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-xs text-green-600 uppercase block">Email Routing Status (aluchastudios67@gmail.com)</span>
-            <span className="text-sm font-semibold">
+            <span className="text-sm font-semibold block truncate">
               {smtp.isConfigured 
-                ? `ACTIVE via ${smtp.smtpHost} (${smtp.smtpUser})` 
-                : "LOCAL LOG Fallback Mode (SMTP environment variables missing)"}
+                ? `ACTIVE` 
+                : "LOCAL LOG Fallback Mode"}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -273,6 +301,38 @@ function AdminComponent() {
             )}
           </div>
         </div>
+
+        <div className="border border-green-500/30 bg-green-950/10 p-4 rounded flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs text-green-600 uppercase block">Supabase Connection</span>
+            <span className="text-sm font-semibold block truncate">
+              {smtp.supabase?.url ? "CONFIGURED" : "MISSING ENV VARS"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {smtp.supabase?.url && smtp.supabase?.hasAnonKey ? (
+              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 border border-green-500 bg-green-950/30 text-green-400">
+                OK
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 border border-red-500 bg-red-950/20 text-red-400">
+                ⚠️ ERROR
+              </span>
+            )}
+          </div>
+        </div>
+
+        {smtp.supabase && (
+          <div className="md:col-span-3 border border-green-500/20 bg-green-950/5 p-4 rounded text-xs space-y-1 font-mono">
+            <span className="text-green-600 uppercase block mb-1">Server Environment Diagnostics</span>
+            <p>SUPABASE_URL: <span className="text-white">{smtp.supabase.url || "MISSING"}</span></p>
+            <p>SUPABASE_ANON_KEY: <span className="text-white">
+              {smtp.supabase.hasAnonKey 
+                ? `PRESENT (${smtp.supabase.anonKeyLength} chars, starts with "${smtp.supabase.anonKeyStart}")` 
+                : "MISSING"}
+            </span></p>
+          </div>
+        )}
       </div>
 
       {/* Stats Board */}

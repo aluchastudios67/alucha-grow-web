@@ -170,6 +170,12 @@ export async function serverCheckSmtpStatus() {
     isConfigured: !!(smtpHost && smtpUser && process.env.SMTP_PASS),
     smtpHost: smtpHost || null,
     smtpUser: smtpUser || null,
+    supabase: {
+      url: process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL.substring(0, 20)}...` : null,
+      hasAnonKey: !!process.env.SUPABASE_ANON_KEY,
+      anonKeyLength: process.env.SUPABASE_ANON_KEY ? process.env.SUPABASE_ANON_KEY.length : 0,
+      anonKeyStart: process.env.SUPABASE_ANON_KEY ? `${process.env.SUPABASE_ANON_KEY.substring(0, 15)}...` : null,
+    }
   };
 }
 
