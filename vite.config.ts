@@ -24,7 +24,6 @@ export default defineConfig(({ isSsrBuild }) => {
       rollupOptions: {
         external: !isServer
           ? [
-              "nodemailer",
               "node:fs/promises",
               "node:path",
               "fs",
