@@ -15,7 +15,13 @@ export interface Order {
 function getSupabase() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error("Supabase env vars not set");
+  if (!url || !key) {
+    console.error("[Supabase] Missing env vars:", {
+      SUPABASE_URL: url ? "✓ set" : "✗ MISSING",
+      SUPABASE_ANON_KEY: key ? "✓ set" : "✗ MISSING",
+    });
+    throw new Error("Supabase env vars not set (SUPABASE_URL / SUPABASE_ANON_KEY)");
+  }
   return createClient(url, key);
 }
 
