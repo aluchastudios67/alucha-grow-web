@@ -13,7 +13,12 @@ export default defineConfig(({ isSsrBuild }) => {
     plugins: [
       tsconfigPaths({ projects: ["./tsconfig.json"] }),
       tanstackStart(),
-      nitro({ preset: "vercel" }),
+      nitro({
+        preset: "vercel",
+        externals: {
+          inline: ["nodemailer"],
+        },
+      }),
       react(),
       tailwindcss(),
     ],
