@@ -39,7 +39,6 @@ export default defineConfig(({ isSsrBuild }) => {
       noExternal: [
         "@tanstack/react-start",
         "@tanstack/react-router",
-        "nodemailer", // Force Vite to bundle nodemailer to avoid Vercel module resolution issues
       ],
       external: [
         "react",
@@ -48,9 +47,7 @@ export default defineConfig(({ isSsrBuild }) => {
         "react/jsx-dev-runtime",
       ],
     },
-    optimizeDeps: {
-      exclude: ["nodemailer"],
-    },
+    optimizeDeps: {},
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

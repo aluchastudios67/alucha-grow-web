@@ -1,5 +1,3 @@
-// cache bust 1
-import nodemailer from "nodemailer";
 import { createClient } from "@supabase/supabase-js";
 
 export interface Order {
@@ -93,7 +91,9 @@ You can manage this order in the admin panel.`;
 
   if (smtpHost && smtpUser && smtpPass) {
     try {
-      const transporter = nodemailer.createTransport({
+      // Dynamic import to avoid module resolution issues on Vercel and during Vite dev
+      const nodemailer = await import("nodemailer");
+      const transporter = nodemailer.default.createTransport({
         host: smtpHost,
         port: Number(smtpPort || 587),
         secure: Number(smtpPort || 587) === 465,
