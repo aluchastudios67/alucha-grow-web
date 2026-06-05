@@ -15,10 +15,6 @@ export default defineConfig(({ isSsrBuild }) => {
       tanstackStart(),
       nitro({
         preset: "vercel",
-        externals: {
-          // Explicitly trace nodemailer for Vercel
-          traceInclude: ["node_modules/nodemailer/**"],
-        },
       }),
       react(),
       tailwindcss(),
@@ -35,22 +31,21 @@ export default defineConfig(({ isSsrBuild }) => {
               "dns",
               "net",
               "tls",
-              "nodemailer", // Externalize for client build
             ]
-          : ["nodemailer"], // Externalize for server build
+          : [],
       },
     },
     ssr: {
       noExternal: [
         "@tanstack/react-start",
         "@tanstack/react-router",
+        "nodemailer", // Force Vite to bundle nodemailer to avoid Vercel module resolution issues
       ],
       external: [
         "react",
         "react-dom",
         "react/jsx-runtime",
         "react/jsx-dev-runtime",
-        "nodemailer", // Force externalize for Node.js runtime
       ],
     },
     optimizeDeps: {},
