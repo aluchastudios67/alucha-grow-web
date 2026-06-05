@@ -48,7 +48,9 @@ export default defineConfig(({ isSsrBuild }) => {
         "react/jsx-dev-runtime",
       ],
     },
-    optimizeDeps: {},
+    optimizeDeps: {
+      exclude: ["nodemailer"],
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
