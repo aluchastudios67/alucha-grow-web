@@ -19,9 +19,6 @@ export default defineConfig(({ isSsrBuild }) => {
       tailwindcss(),
       nitro({
         preset: "vercel",
-        externals: {
-          traceInclude: ["nodemailer"],
-        },
       }),
     ],
     build: {
