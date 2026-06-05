@@ -1,7 +1,10 @@
 import { Instagram, Linkedin, Github } from "lucide-react";
-import logoAsset from "@/assets/alucha-logo.png.asset.json";
+import logoImage from "@/assets/alucha studios png.png";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="relative border-t border-white/5 mt-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
@@ -9,25 +12,32 @@ export function Footer() {
           <div>
             <a href="#top" className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl overflow-hidden ring-1 ring-white/10">
-                <img src={logoAsset.url} alt="Alucha Studios" className="w-full h-full object-cover" />
+                <img src={logoImage} alt="Alucha Studios" className="w-full h-full object-cover" />
               </div>
               <div className="leading-none">
                 <div className="font-display font-semibold">Alucha Studios</div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Tbilisi · Worldwide</div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{t("footer.location")} · Worldwide</div>
               </div>
             </a>
             <p className="mt-5 text-sm text-muted-foreground max-w-sm">
-              ალუჩა — sour, sharp and unmistakably ours. We grow web masterpieces for ambitious teams.
+              {t("footer.desc")}
             </p>
           </div>
 
-          <FooterCol title="Studio" links={["About", "Process", "Careers"]} />
-          <FooterCol title="Work" links={["Portfolio", "Pricing", "Case studies"]} />
-          <FooterCol title="Contact" links={["hello@alucha.studio", "+995 555 00 00", "Tbilisi, Vake"]} />
+          <FooterCol title={t("footer.colStudio")} links={[t("footer.linkAbout"), t("footer.linkProcess"), t("footer.linkCareers")]} />
+          <FooterCol 
+            title={t("footer.colWork")} 
+            links={[
+              t("footer.linkPortfolio"), 
+              // t("footer.linkPricing"), 
+              t("footer.linkCaseStudies")
+            ]} 
+          />
+          <FooterCol title={t("footer.colContact")} links={["hello@alucha.studio", "+995 555 00 00", t("footer.location")]} />
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Alucha Studios. All rights grown.</p>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Alucha Studios. {t("footer.copyright")}</p>
           <div className="flex items-center gap-2">
             {[Instagram, Linkedin, Github].map((Icon, i) => (
               <a
@@ -52,7 +62,11 @@ function FooterCol({ title, links }: { title: string; links: string[] }) {
       <h4 className="text-xs uppercase tracking-[0.2em] text-foreground mb-4">{title}</h4>
       <ul className="space-y-2.5 text-sm">
         {links.map((l) => (
-          <li key={l}><a href="#" className="text-muted-foreground hover:text-alucha transition-colors">{l}</a></li>
+          <li key={l}>
+            <a href="#" className="text-muted-foreground hover:text-alucha transition-colors">
+              {l}
+            </a>
+          </li>
         ))}
       </ul>
     </div>

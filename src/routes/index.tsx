@@ -4,7 +4,7 @@ import { Hero } from "@/components/alucha/Hero";
 import { Features } from "@/components/alucha/Features";
 import { Builder } from "@/components/alucha/Builder";
 import { Portfolio } from "@/components/alucha/Portfolio";
-import { Pricing } from "@/components/alucha/Pricing";
+// import { Pricing } from "@/components/alucha/Pricing";
 import { Contact } from "@/components/alucha/Contact";
 import { Footer } from "@/components/alucha/Footer";
 
@@ -29,7 +29,7 @@ function Index() {
       <Features />
       <Builder />
       <Portfolio />
-      <Pricing />
+      {/* <Pricing /> */}
       <Contact />
       <Footer />
     </main>

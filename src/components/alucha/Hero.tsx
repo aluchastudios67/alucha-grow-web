@@ -1,12 +1,14 @@
 import { ArrowRight, Sparkles, Satellite } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CrystalAlucha } from "./CrystalAlucha";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function Hero() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const [mx, setMx] = useState(0);
   const [my, setMy] = useState(0);
   const [plumHover, setPlumHover] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const el = sceneRef.current;
@@ -60,50 +62,46 @@ export function Hero() {
         <div className="animate-fade-up" style={layer(12)}>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs text-muted-foreground mb-6">
             <Sparkles size={14} className="text-alucha" />
-            <span>Georgian-grown · Globally minded</span>
+            <span>{t("hero.badge")}</span>
           </div>
           <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.02] text-chromatic">
-            <span className="text-metallic">We grow web</span>
+            <span className="text-metallic">{t("hero.title")}</span>
             <br />
-            <span className="text-metallic">masterpieces.</span>
-            <br />
-            <span className="text-gradient-alucha">Sharp. Fast. Organic.</span>
+            <span className="text-gradient-alucha">{t("hero.sub")}</span>
           </h1>
           <p className="mt-7 max-w-xl text-lg text-muted-foreground leading-relaxed">
-            Alucha Studios combines the sharpest design standards with lightning-fast
-            performance to build your brand&rsquo;s digital home — handcrafted in Tbilisi,
-            engineered for the world.
+            {t("hero.desc")}
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <a
               href="#contact"
               className="glass-refract group inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-alucha text-primary-foreground font-medium hover:shadow-[0_0_60px_-10px_var(--alucha)] hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
-              Launch your project
+              {t("hero.ctaLaunch")}
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
               href="#features"
               className="glass-refract inline-flex items-center gap-2 px-6 py-3.5 rounded-xl border border-white/15 text-foreground font-medium hover:border-alucha/60 hover:bg-white/5 transition-all"
             >
-              Explore features
+              {t("hero.ctaExplore")}
             </a>
           </div>
 
           <div className="mt-12 flex items-center gap-8 text-sm text-muted-foreground">
             <div>
               <div className="font-display text-2xl text-metallic">120+</div>
-              <div className="text-xs uppercase tracking-wider">Sites grown</div>
+              <div className="text-xs uppercase tracking-wider">{t("hero.statSites")}</div>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div>
               <div className="font-display text-2xl text-metallic">99<span className="text-alucha">/100</span></div>
-              <div className="text-xs uppercase tracking-wider">Lighthouse avg.</div>
+              <div className="text-xs uppercase tracking-wider">{t("hero.statLighthouse")}</div>
             </div>
             <div className="w-px h-10 bg-white/10 hidden sm:block" />
             <div className="hidden sm:block">
               <div className="font-display text-2xl text-metallic">.ge → .com</div>
-              <div className="text-xs uppercase tracking-wider">Local + global</div>
+              <div className="text-xs uppercase tracking-wider">{t("hero.statMarket")}</div>
             </div>
           </div>
         </div>

@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function Pricing() {
   const [pages, setPages] = useState(6);
   const [ecom, setEcom] = useState(false);
   const [threeD, setThreeD] = useState(true);
   const [cms, setCms] = useState(false);
+  const { t } = useTranslation();
 
   const { price, weeks } = useMemo(() => {
     let base = 1800;
@@ -21,12 +23,12 @@ export function Pricing() {
     <section id="pricing" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="max-w-2xl mb-12">
-          <span className="text-xs uppercase tracking-[0.25em] text-alucha">Estimator</span>
+          <span className="text-xs uppercase tracking-[0.25em] text-alucha">{t("pricing.badge")}</span>
           <h2 className="mt-4 text-4xl sm:text-5xl font-bold">
-            Shape your <span className="text-gradient-alucha">harvest</span>.
+            {t("pricing.title")}
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Move the sliders, toggle the options, and see a transparent starting price and timeline.
+            {t("pricing.desc")}
           </p>
         </div>
 
@@ -35,7 +37,7 @@ export function Pricing() {
             <div className="space-y-8">
               <div>
                 <div className="flex items-baseline justify-between mb-3">
-                  <label className="text-sm font-medium">Number of pages</label>
+                  <label className="text-sm font-medium">{t("pricing.pages")}</label>
                   <span className="font-display text-2xl text-alucha">{pages}</span>
                 </div>
                 <input
@@ -44,14 +46,16 @@ export function Pricing() {
                   className="alucha-slider w-full"
                 />
                 <div className="flex justify-between text-[11px] text-muted-foreground mt-2">
-                  <span>Landing</span><span>Mid-site</span><span>Platform</span>
+                  <span>{t("pricing.pagesLanding")}</span>
+                  <span>{t("pricing.pagesMid")}</span>
+                  <span>{t("pricing.pagesPlatform")}</span>
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-3 gap-3">
-                <Toggle label="E-commerce" sub="Cart, checkout, payments" on={ecom} onClick={() => setEcom(!ecom)} />
-                <Toggle label="3D visuals" sub="Custom WebGL & motion" on={threeD} onClick={() => setThreeD(!threeD)} />
-                <Toggle label="CMS" sub="Editable content backend" on={cms} onClick={() => setCms(!cms)} />
+                <Toggle label={t("pricing.ecomTitle")} sub={t("pricing.ecomSub")} on={ecom} onClick={() => setEcom(!ecom)} />
+                <Toggle label={t("pricing.visualsTitle")} sub={t("pricing.visualsSub")} on={threeD} onClick={() => setThreeD(!threeD)} />
+                <Toggle label={t("pricing.cmsTitle")} sub={t("pricing.cmsSub")} on={cms} onClick={() => setCms(!cms)} />
               </div>
             </div>
           </div>
@@ -59,22 +63,22 @@ export function Pricing() {
           <aside className="relative glass-strong rounded-2xl p-8 overflow-hidden">
             <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl bg-alucha/30 pointer-events-none" />
             <div className="relative">
-              <span className="text-xs uppercase tracking-wider text-muted-foreground">Starting from</span>
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">{t("pricing.startingFrom")}</span>
               <div className="mt-2 font-display text-6xl font-bold text-gradient-alucha tabular-nums">
                 ${price.toLocaleString()}
               </div>
               <div className="mt-2 text-sm text-muted-foreground">
-                ~ <span className="text-foreground font-medium">{weeks} weeks</span> to launch
+                ~ <span className="text-foreground font-medium">{weeks} {t("pricing.weeksToLaunch")}</span>
               </div>
               <ul className="mt-6 space-y-2.5 text-sm">
-                {["Discovery & design sprints", "Custom development", "Performance & SEO baseline", "30 days of post-launch care"].map((t) => (
-                  <li key={t} className="flex items-center gap-2 text-muted-foreground">
-                    <Check size={14} className="text-alucha shrink-0" /> {t}
+                {[t("pricing.list1"), t("pricing.list2"), t("pricing.list3"), t("pricing.list4")].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-muted-foreground">
+                    <Check size={14} className="text-alucha shrink-0" /> {item}
                   </li>
                 ))}
               </ul>
               <a href="#contact" className="mt-7 inline-flex w-full justify-center items-center px-5 py-3 rounded-xl bg-alucha text-primary-foreground font-medium hover:shadow-[0_0_40px_-8px_var(--alucha)] transition-all">
-                Request detailed quote
+                {t("pricing.cta")}
               </a>
             </div>
           </aside>
