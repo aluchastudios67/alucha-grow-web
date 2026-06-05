@@ -1,6 +1,5 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import nodemailer from "nodemailer";
+import { createClient } from "@supabase/supabase-js";
 
 export interface Order {
   id: string;
@@ -12,24 +11,34 @@ export interface Order {
   status: "new" | "read" | "replied";
 }
 
-const DATA_DIR = path.resolve(process.cwd(), "src/data");
-const DATA_FILE = path.join(DATA_DIR, "orders.json");
-
-async function ensureDataFile() {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    try {
-      await fs.access(DATA_FILE);
-    } catch {
-      await fs.writeFile(DATA_FILE, JSON.stringify([], null, 2), "utf-8");
-    }
-  } catch (error) {
-    console.error("Error ensuring data file exists:", error);
-  }
+// --- Supabase client (server-side only) ---
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+  if (!url || !key) throw new Error("Supabase env vars not set");
+  return createClient(url, key);
 }
 
-export async function serverSubmitOrder(data: { name: string; email: string; type: string; message: string }) {
-  await ensureDataFile();
+// Map DB row → Order shape
+function rowToOrder(row: any): Order {
+  return {
+    id: row.id,
+    createdAt: row.created_at,
+    name: row.name,
+    email: row.email,
+    type: row.type,
+    message: row.message,
+    status: row.status,
+  };
+}
+
+export async function serverSubmitOrder(data: {
+  name: string;
+  email: string;
+  type: string;
+  message: string;
+}) {
+  const supabase = getSupabase();
 
   const newOrder: Order = {
     id: Math.random().toString(36).substring(2, 11),
@@ -41,22 +50,22 @@ export async function serverSubmitOrder(data: { name: string; email: string; typ
     status: "new",
   };
 
-  let orders: Order[] = [];
-  try {
-    const content = await fs.readFile(DATA_FILE, "utf-8");
-    orders = JSON.parse(content);
-  } catch (e) {
-    console.error("Error reading orders file, resetting data", e);
+  const { error } = await supabase.from("orders").insert({
+    id: newOrder.id,
+    created_at: newOrder.createdAt,
+    name: newOrder.name,
+    email: newOrder.email,
+    type: newOrder.type,
+    message: newOrder.message,
+    status: newOrder.status,
+  });
+
+  if (error) {
+    console.error("Supabase insert error:", error);
+    throw new Error(error.message);
   }
 
-  orders.unshift(newOrder);
-
-  try {
-    await fs.writeFile(DATA_FILE, JSON.stringify(orders, null, 2), "utf-8");
-  } catch (e) {
-    console.error("Failed to write to orders file", e);
-  }
-
+  // --- Send email notification ---
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = process.env.SMTP_PORT;
   const smtpUser = process.env.SMTP_USER;
@@ -81,10 +90,7 @@ You can manage this order in the admin panel.`;
         host: smtpHost,
         port: Number(smtpPort || 587),
         secure: Number(smtpPort || 587) === 465,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
+        auth: { user: smtpUser, pass: smtpPass },
       });
 
       await transporter.sendMail({
@@ -101,9 +107,7 @@ You can manage this order in the admin panel.`;
     }
   } else {
     console.log(`[SMTP Not Configured] Mock email routed to aluchastudios67@gmail.com:`, {
-      to: "aluchastudios67@gmail.com",
       subject: `New Inquiry from ${data.name} - ${data.type}`,
-      body: emailBody,
     });
     emailError = "SMTP environment variables not configured";
   }
@@ -117,34 +121,40 @@ You can manage this order in the admin panel.`;
 }
 
 export async function serverGetOrders(): Promise<Order[]> {
-  await ensureDataFile();
-  try {
-    const content = await fs.readFile(DATA_FILE, "utf-8");
-    const orders: Order[] = JSON.parse(content);
-    return orders;
-  } catch (e) {
-    console.error("Error reading orders file", e);
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Supabase fetch error:", error);
     return [];
   }
+
+  return (data ?? []).map(rowToOrder);
 }
 
-export async function serverUpdateOrderStatus(id: string, status: "new" | "read" | "replied") {
-  await ensureDataFile();
-  try {
-    const content = await fs.readFile(DATA_FILE, "utf-8");
-    let orders: Order[] = JSON.parse(content);
-    
-    const orderIndex = orders.findIndex((o) => o.id === id);
-    if (orderIndex !== -1) {
-      orders[orderIndex].status = status;
-      await fs.writeFile(DATA_FILE, JSON.stringify(orders, null, 2), "utf-8");
-      return { success: true, order: orders[orderIndex] };
-    }
-    return { success: false, error: "Order not found" };
-  } catch (e: any) {
-    console.error("Error updating order status", e);
-    return { success: false, error: e?.message || "Internal error" };
+export async function serverUpdateOrderStatus(
+  id: string,
+  status: "new" | "read" | "replied"
+) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update({ status })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Supabase update error:", error);
+    return { success: false, error: error.message };
   }
+
+  return { success: true, order: rowToOrder(data) };
 }
 
 export async function serverCheckSmtpStatus() {
@@ -158,19 +168,14 @@ export async function serverCheckSmtpStatus() {
 }
 
 export async function serverDeleteOrder(id: string) {
-  await ensureDataFile();
-  try {
-    const content = await fs.readFile(DATA_FILE, "utf-8");
-    let orders: Order[] = JSON.parse(content);
-    const lengthBefore = orders.length;
-    orders = orders.filter((o) => o.id !== id);
-    if (orders.length === lengthBefore) {
-      return { success: false, error: "Order not found" };
-    }
-    await fs.writeFile(DATA_FILE, JSON.stringify(orders, null, 2), "utf-8");
-    return { success: true };
-  } catch (e: any) {
-    console.error("Error deleting order", e);
-    return { success: false, error: e?.message || "Internal error" };
+  const supabase = getSupabase();
+
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+
+  if (error) {
+    console.error("Supabase delete error:", error);
+    return { success: false, error: error.message };
   }
+
+  return { success: true };
 }
