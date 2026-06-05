@@ -15,9 +15,7 @@ export default defineConfig(({ isSsrBuild }) => {
       tanstackStart(),
       nitro({
         preset: "vercel",
-        externals: {
-          inline: ["nodemailer"],
-        },
+        // No externals inline for nodemailer; let Vite bundle it normally
       }),
       react(),
       tailwindcss(),
@@ -41,11 +39,12 @@ export default defineConfig(({ isSsrBuild }) => {
     },
     ssr: {
       // Don't bundle React/ReactDOM — let Node.js handle the CJS modules
-      noExternal: [
-        "@tanstack/react-start",
-        "@tanstack/react-router",
-        "nodemailer",
-      ],
+        // Ensure nodemailer is bundled rather than treated as external
+        noExternal: [
+          "@tanstack/react-start",
+          "@tanstack/react-router",
+          "nodemailer",
+        ],
       external: [
         "react",
         "react-dom",
@@ -54,7 +53,8 @@ export default defineConfig(({ isSsrBuild }) => {
       ],
     },
     optimizeDeps: {
-      exclude: ["nodemailer"],
+      // Ensure nodemailer is not excluded from optimization
+      // (no exclusion needed)
     },
     resolve: {
       alias: {
