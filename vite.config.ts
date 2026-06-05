@@ -36,7 +36,11 @@ export default defineConfig(({ isSsrBuild }) => {
     },
     ssr: {
       // Don't bundle React/ReactDOM — let Node.js handle the CJS modules
-      noExternal: ["@tanstack/react-start", "@tanstack/react-router"],
+      noExternal: [
+        "@tanstack/react-start",
+        "@tanstack/react-router",
+        "nodemailer",
+      ],
       external: [
         "react",
         "react-dom",
